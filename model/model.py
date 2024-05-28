@@ -52,28 +52,33 @@ class Model:
         self.costo=0
 
         for i in self.grafo.nodes:
-            self.ricorsione([i],numero,0,i)
+            self.ricorsione([i],numero+1,i)
 
         return self.ricor,self.costo
 
 
 
 
-    def ricorsione(self,parziale,max,cos,start):
+    def ricorsione(self,parziale,max,start):
         if len(parziale) == max:
-            if parziale[-1].Retailer_code == parziale[0].Retailer_code and self.costo<=cos:
+            if parziale[-1].Retailer_code == parziale[0].Retailer_code and self.costo<self.contapeso(parziale):
                 self.ricor=copy.deepcopy(parziale)
-                self.costo=cos
+                self.costo=self.contapeso(parziale)
+                print(self.contapeso(parziale))
 
         else:
             for i in self.grafo.neighbors(parziale[-1]):
                 if i not in parziale[1:] and i.Retailer_code!=start.Retailer_code:
-                    cos += self.grafo[parziale[-1]][i]['weight']
                     parziale.append(i)
-                    self.ricorsione(parziale,max,cos,start)
+                    self.ricorsione(parziale,max,start)
                     parziale.pop()
                 elif i not in parziale[1:] and i.Retailer_code==start.Retailer_code and len(parziale)==(max-1):
-                    cos += self.grafo[parziale[-1]][i]['weight']
                     parziale.append(i)
-                    self.ricorsione(parziale, max, cos,start)
+                    self.ricorsione(parziale, max,start)
                     parziale.pop()
+
+    def contapeso(self,parziale):
+        costo=0
+        for i in range(0,len(parziale)-1):
+            costo += self.grafo[parziale[i]][parziale[i+1]]['weight']
+        return costo
